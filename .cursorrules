@@ -1,0 +1,46 @@
+
+
+
+project-purpose: Créer une scène 3D interactive stylisée en React avec @react-three/fiber, représentant un bureau cartoon vue en plan fixe isométrique. Chaque élément (boîte, feuilles, tableau, plante...) est un composant séparé, interactif et animé. L'objectif est d'offrir une expérience immersive ludique autour d'une mécanique de tirage au sort.
+
+style-guide:
+  - style-visuel: Cartoon low-poly stylisé, aux couleurs pastel douces, sans texture réaliste.
+  - ombrage: SoftShadows
+  - géométries: Utiliser boxGeometry, planeGeometry, cylinderGeometry ou RoundedBox.
+  - matériaux: Principalement meshStandardMaterial ou meshPhysicalMaterial pour effets doux ou verre noir.
+  - palette: beige #f2f0ed, blanc #ffffff, noir #111111, vert doux, gris clair #c0c0c0.
+
+interactions:
+  - Clic sur une feuille dans la pile ➜ affiche un champ de texte.
+  - Entrée clavier ➜ fait voler une feuille vers la boîte.
+  - Clic sur la boîte ➜ la boîte tremble, une feuille en ressort.
+  - Chaque tirage est ajouté au tableau d’historique fixé au mur.
+
+structure-cible:
+  - components/3D/
+    - Scene.tsx (canvas, lumière, état)
+    - Floor.tsx (sol pastel)
+    - Wall.tsx (mur arrière)
+    - Desk.tsx (table blanche + pieds)
+    - Box.tsx (boîte noire posée sur table)
+    - Paper.tsx (feuille animée)
+    - PaperStack.tsx (pile de feuilles)
+    - Board.tsx (tableau liège sur mur)
+    - HistoryNote.tsx (feuille cliquable historique)
+    - Plant.tsx (élément déco)
+    - CameraController.tsx (zoom dynamique)
+  - lib/store.ts ➜ Zustand : état global (prénoms, historique, zoom)
+
+frameworks:
+  - React
+  - TypeScript
+  - @react-three/fiber
+  - @react-three/drei
+  - Zustand
+
+constraints:
+  - Pas de GLTF ni de textures photo réalistes
+  - Plan fixe (vue en plongée)
+  - Pas de rotation libre
+  - Composants isolés, réutilisables
+  - Utilisation d’animations simples basées sur useFrame ou framer-motion si besoin

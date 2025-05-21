@@ -1,41 +1,57 @@
 "use client";
 
+import { useStore } from "@/lib/store";
 import { RoundedBox } from "@react-three/drei";
-import { useEffect, useState } from "react";
+import { ThreeElements, useFrame } from "@react-three/fiber";
+import { useRef } from "react";
+import * as THREE from "three";
 
-export function Box() {
-  const [dimensions, setDimensions] = useState<[number, number, number]>([
-    4, 2.5, 2,
-  ]);
+export default function Box(props: ThreeElements["group"]) {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const boxShaking = useStore((state) => state.boxShaking);
+  const drawName = useStore((state) => state.drawName);
+  const setCameraTarget = useStore((state) => state.setCameraTarget);
 
-  useEffect(() => {
-    const updateBoxSize = () => {
-      const width = window.innerWidth;
-      const ratio = width < 768 ? 2.5 : width < 1024 ? 3.5 : 4;
+  // Animation
+  useFrame(() => {
+    if (!meshRef.current || !boxShaking) return;
 
-      const height = ratio * 0.6;
-      const depth = ratio * 0.5;
+    // Animation simple de tremblement
+    meshRef.current.rotation.z = Math.sin(Date.now() * 0.02) * 0.05;
+    meshRef.current.rotation.x = Math.cos(Date.now() * 0.02) * 0.03;
+  });
 
-      setDimensions([ratio, height, depth]);
-    };
-
-    updateBoxSize();
-    window.addEventListener("resize", updateBoxSize);
-    return () => window.removeEventListener("resize", updateBoxSize);
-  }, []);
-
-  const [w, h, d] = dimensions;
+  // Gérer le clic sur la boîte
+  const handleClick = () => {
+    drawName();
+    setCameraTarget("box");
+  };
 
   return (
-    <RoundedBox
-      args={dimensions}
-      radius={0.15}
-      smoothness={8}
-      castShadow
-      receiveShadow
-      position={[0, h / 2, 0]}
-    >
-      <meshStandardMaterial color="#F6A5C0" roughness={0.8} metalness={0} />
-    </RoundedBox>
+    <group {...props}>
+      {/* Boîte principale */}
+      <RoundedBox
+        ref={meshRef}
+        args={[1, 0.8, 1]}
+        radius={0.1}
+        smoothness={4}
+        castShadow
+        onClick={handleClick}
+      >
+        <meshPhysicalMaterial
+          color="#111111"
+          roughness={0.2}
+          clearcoat={0.8}
+          clearcoatRoughness={0.2}
+          reflectivity={1}
+        />
+      </RoundedBox>
+
+      {/* Fente en haut de la boîte */}
+      <mesh position={[0, 0.4, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[0.6, 0.05]} />
+        <meshBasicMaterial color="#222222" />
+      </mesh>
+    </group>
   );
 }

@@ -26,7 +26,7 @@ export default function Plant(props: ThreeElements["group"]) {
       </mesh>
 
       {/* Dessus du pot - terre */}
-      <mesh position={[0, 0.5, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh position={[0, 0.51, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <circleGeometry args={[0.18, 16]} />
         <meshStandardMaterial color="#5e4b3e" />
       </mesh>

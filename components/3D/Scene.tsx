@@ -45,12 +45,12 @@ export default function Scene() {
         <Desk position={[1, 0, -1.7]} />
 
         {/* Objets interactifs */}
-        <Hat position={[0.5, 0.6, -1.7]} />
+        <Hat position={[0.5, 1, -1.7]} />
         <PaperStack position={[1.8, 0.5, -1.7]} />
         <Board position={[0.5, 1.8, -3]} />
 
         {/* Décorations */}
-        <Plant position={[-2.5, 0, -2.5]} />
+        <Plant position={[-2.4, 0, -2.4]} />
       </Suspense>
     </Canvas>
   );

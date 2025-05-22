@@ -5,14 +5,13 @@ import { useRef } from "react";
 export default function TopHat(props) {
   const group = useRef();
   const { nodes, materials } = useGLTF("/models/top-hat.glb");
-  console.log(nodes);
 
   return (
     <group
       ref={group}
       {...props}
       dispose={null}
-      scale={0.05}
+      scale={0.04}
       rotation={[-Math.PI, 0, 0]}
     >
       <mesh

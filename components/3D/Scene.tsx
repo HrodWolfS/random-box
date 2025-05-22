@@ -2,12 +2,14 @@
 
 import Board from "@/components/3D/Board";
 import CameraController from "@/components/3D/CameraController";
+import Couch from "@/components/3D/Couch";
 import Desk from "@/components/3D/Desk";
 import Floor from "@/components/3D/Floor";
 import Hat from "@/components/3D/Hat";
 import LeftWall from "@/components/3D/LeftWall";
 import PaperStack from "@/components/3D/PaperStack";
 import Plant from "@/components/3D/Plant";
+import Rug from "@/components/3D/Rug";
 import Wall from "@/components/3D/Wall";
 import { Environment, SoftShadows } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
@@ -42,15 +44,17 @@ export default function Scene() {
         <LeftWall />
 
         {/* Mobilier */}
-        <Desk position={[1, 0, -1.7]} />
-
+        <Desk position={[0.5, 0, -0.3]} />
+        <Couch position={[-1.9, 0, 0.2]} rotation={[0, Math.PI / 2, 0]} />
+        <Couch position={[0.8, 0, -2]} />
         {/* Objets interactifs */}
-        <Hat position={[0.5, 1, -1.7]} />
-        <PaperStack position={[1.8, 0.5, -1.7]} />
+        <Hat position={[0.5, 1, 0]} />
+        <PaperStack position={[1.3, 0.69, 0]} />
         <Board position={[0.5, 1.8, -3]} />
 
         {/* Décorations */}
-        <Plant position={[-2.4, 0, -2.4]} />
+        <Plant position={[-2.3, 0, -2.4]} />
+        <Rug position={[0.8, 0, 0]} />
       </Suspense>
     </Canvas>
   );

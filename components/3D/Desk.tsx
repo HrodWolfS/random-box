@@ -5,7 +5,6 @@ import { ThreeElements } from "@react-three/fiber";
 
 export default function Desk(props: ThreeElements["group"]) {
   const { nodes, materials } = useGLTF("/models/Table.glb") as any;
-  console.log(nodes);
 
   return (
     <group {...props} dispose={null} scale={[2.6, 2.6, 2.6]}>

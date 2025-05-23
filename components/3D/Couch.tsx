@@ -8,7 +8,6 @@ import { Group } from "three";
 export default function Couch(props: ThreeElements["group"]) {
   const group = useRef<Group>(null);
   const { nodes, materials } = useGLTF("/models/couch.glb") as any;
-  console.log(nodes);
 
   return (
     <group ref={group} {...props} dispose={null} scale={0.5}>

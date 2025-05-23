@@ -2,12 +2,15 @@
 
 import HistoryNote from "@/components/3D/HistoryNote";
 import { useStore } from "@/lib/store";
-import { RoundedBox, Text } from "@react-three/drei";
+import { Text, useGLTF } from "@react-three/drei";
 import { ThreeElements } from "@react-three/fiber";
 
 export default function Board(props: ThreeElements["group"]) {
-  const history = useStore((state) => state.history);
   const setCameraTarget = useStore((state) => state.setCameraTarget);
+  const history = useStore((state) => state.history);
+
+  const { nodes, materials } = useGLTF("/models/board.glb") as any;
+  console.log(nodes);
 
   // Gérer le clic sur le tableau
   const handleClick = () => {
@@ -16,40 +19,45 @@ export default function Board(props: ThreeElements["group"]) {
 
   return (
     <group {...props} onClick={handleClick}>
-      {/* Tableau en liège */}
-      <RoundedBox args={[3, 2, 0.1]} radius={0.05} smoothness={4} castShadow>
-        <meshStandardMaterial color="#d4a76a" />
-      </RoundedBox>
-
-      {/* Titre du tableau */}
+      <primitive
+        object={nodes.Message_Board}
+        scale={[0.02, 0.02, 0.02]}
+        rotation={[0, -Math.PI / 2, 0]}
+      />
+      {/* Paper background behind the title */}
+      <mesh position={[0.2, 1.45, 0]} rotation={[0, 0, 0.1]}>
+        <planeGeometry args={[1.2, 0.2]} />
+        <meshStandardMaterial color="#52a9ff" toneMapped={false} />
+      </mesh>
+      {/* Long note at the top with "historique" */}
       <Text
-        position={[0, 0.8, 0.06]}
-        fontSize={0.15}
-        color="#111111"
+        position={[0.2, 1.45, 0.01]}
+        rotation={[0, 0, 0.1]}
+        fontSize={0.1}
+        color="#000000"
         anchorX="center"
         anchorY="middle"
       >
-        Historique des tirages
+        historique des tirages
       </Text>
 
-      {/* Notes d'historique */}
-      <group position={[0, 0.1, 0.06]}>
-        {history.length === 0 ? (
+      {/* Notes d'historique affichées dans le tableau */}
+      <group position={[0, 40, 1]}>
+        {!Array.isArray(history) || history.length === 0 ? (
           <Text
             position={[0, 0, 0]}
             fontSize={0.1}
-            color="#555555"
+            color="#444444"
             anchorX="center"
             anchorY="middle"
           >
             Aucun tirage pour le moment
           </Text>
         ) : (
-          history.slice(0, 9).map((name, index) => {
-            // Calculer la position en grille 3x3
+          history?.slice?.(0, 9)?.map((name, index) => {
             const row = Math.floor(index / 3);
             const col = index % 3;
-            const x = (col - 1) * 0.8;
+            const x = (col - 1) * 0.9;
             const y = 0.4 - row * 0.6;
 
             return (

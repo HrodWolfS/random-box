@@ -6,6 +6,8 @@ export type Name = {
   text: string;
 };
 
+type CameraPosition = [number, number, number];
+
 type State = {
   // Liste des noms à tirer au sort
   names: Name[];
@@ -16,8 +18,16 @@ type State = {
   // État du champ de saisie
   inputActive: boolean;
   // Contrôle de la caméra
-  cameraTarget: "desk" | "board" | "box" | "default";
+  cameraTarget: "room" | "desk" | "board" | "hat" | "default";
   cameraZoom: number;
+  cameraPositions: {
+    room: CameraPosition;
+    desk: CameraPosition;
+    board: CameraPosition;
+    hat: CameraPosition;
+    default: CameraPosition;
+  };
+  cameraTweening: boolean;
   // Animation states
   boxShaking: boolean;
   paperFlying: boolean;
@@ -34,6 +44,7 @@ type Actions = {
   // Contrôler la caméra
   setCameraTarget: (target: State["cameraTarget"]) => void;
   setCameraZoom: (zoom: number) => void;
+  setCameraTweening: (tweening: boolean) => void;
   // Contrôler les animations
   setBoxShaking: (shaking: boolean) => void;
   setPaperFlying: (flying: boolean) => void;
@@ -49,8 +60,16 @@ export const useStore = create<State & Actions>()(
     history: [],
     selectedName: null,
     inputActive: false,
-    cameraTarget: "default",
+    cameraTarget: "room",
     cameraZoom: 45,
+    cameraPositions: {
+      room: [3.5, 3.2, 4.5], // Vue plongeante latérale plus réaliste
+      desk: [0.4, 1.2, 1.7], // Ajustée sur la table basse
+      board: [0.6, 1.7, 2.0], // Ajustée pour viser le board précisément
+      hat: [0.5, 1.15, 1.5], // Plus proche et centrée sur le chapeau
+      default: [3.5, 3.2, 4.5],
+    },
+    cameraTweening: false,
     boxShaking: false,
     paperFlying: false,
     paperExiting: false,
@@ -96,6 +115,7 @@ export const useStore = create<State & Actions>()(
     setInputActive: (active) => set({ inputActive: active }),
     setCameraTarget: (target) => set({ cameraTarget: target }),
     setCameraZoom: (zoom) => set({ cameraZoom: zoom }),
+    setCameraTweening: (tweening) => set({ cameraTweening: tweening }),
     setBoxShaking: (shaking) => set({ boxShaking: shaking }),
     setPaperFlying: (flying) => set({ paperFlying: flying }),
     setPaperExiting: (exiting) => set({ paperExiting: exiting }),

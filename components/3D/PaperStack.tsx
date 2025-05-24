@@ -8,16 +8,20 @@ import Paper from "./Paper";
 
 export default function PaperStack(props: ThreeElements["group"]) {
   const [inputValue, setInputValue] = useState("");
+  const [hovered, setHovered] = useState(false);
   const addName = useStore((state) => state.addName);
   const inputActive = useStore((state) => state.inputActive);
   const setInputActive = useStore((state) => state.setInputActive);
   const paperFlying = useStore((state) => state.paperFlying);
   const setCameraTarget = useStore((state) => state.setCameraTarget);
+  const cameraTweening = useStore((state) => state.cameraTweening);
 
   // Gérer le clic sur la pile de papiers
-  const handleClick = () => {
-    setInputActive(true);
-    setCameraTarget("desk");
+  const handlePaperClick = () => {
+    if (!cameraTweening) {
+      setInputActive(true);
+      setCameraTarget("desk");
+    }
   };
 
   // Gérer la soumission du nom
@@ -40,13 +44,26 @@ export default function PaperStack(props: ThreeElements["group"]) {
   }, [inputActive]);
 
   return (
-    <group {...props}>
+    <group
+      {...props}
+      onPointerOver={(e) => {
+        e.stopPropagation();
+        if (!cameraTweening) {
+          setHovered(true);
+          document.body.style.cursor = "pointer";
+        }
+      }}
+      onPointerOut={() => {
+        setHovered(false);
+        document.body.style.cursor = "default";
+      }}
+    >
       {/* Pile de 3 feuilles légèrement décalées */}
       <Paper position={[0, 0, 0]} />
       <Paper position={[0.05, 0.01, 0.03]} />
       <Paper
-        position={[0.1, 0.02, 0.06]}
-        onClick={handleClick}
+        position={[0.1, , 0.06]}
+        onClick={handlePaperClick}
         isFlying={paperFlying}
         targetPosition={[0, 0.8, 0]}
       />

@@ -1,63 +1,84 @@
 "use client";
 
 import { useStore } from "@/lib/store";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
 export default function CameraController() {
   const cameraTarget = useStore((state) => state.cameraTarget);
+  const cameraPositions = useStore((state) => state.cameraPositions);
   const cameraZoom = useStore((state) => state.cameraZoom);
-  const cameraRef = useRef<THREE.Vector3>(new THREE.Vector3(10, 10, 10));
-  const lookAtRef = useRef<THREE.Vector3>(new THREE.Vector3(0, 0.5, 0));
+  const setCameraTweening = useStore((state) => state.setCameraTweening);
 
+  const { camera } = useThree();
+  const targetPosition = useRef(new THREE.Vector3());
+  const lookAtTarget = useRef(new THREE.Vector3(0, 0.5, 0));
+  const isTweening = useRef(false);
+
+  // Mettre à jour la position cible lorsque cameraTarget change
   useEffect(() => {
-    // Définir les positions cibles en fonction de la cible sélectionnée
+    const [x, y, z] = cameraPositions[cameraTarget];
+    targetPosition.current.set(x, y, z);
+
+    // Définir le point de visée en fonction de la cible
     switch (cameraTarget) {
-      case "desk":
-        lookAtRef.current.set(0, 0.5, 0);
-        cameraRef.current.set(4, 3, 4);
-        break;
       case "board":
-        lookAtRef.current.set(0, 1.8, -2);
-        cameraRef.current.set(0, 2, 0);
+        lookAtTarget.current.set(0, 1.8, -2);
         break;
-      case "box":
-        lookAtRef.current.set(0, 0.8, 0); // Pointer vers le milieu du chapeau
-        cameraRef.current.set(2, 2, 2);
+      case "desk":
+        lookAtTarget.current.set(0, 0.5, 0);
+        break;
+      case "hat":
+        lookAtTarget.current.set(0, 1, 0);
         break;
       default:
-        lookAtRef.current.set(0, 0.5, 0);
-        cameraRef.current.set(4, 5, 6);
+        lookAtTarget.current.set(0, 0.5, 0);
         break;
     }
-  }, [cameraTarget]);
 
-  useFrame(({ camera }) => {
-    // Animation douce de la caméra vers sa cible
-    camera.position.lerp(cameraRef.current, 0.05);
+    // Indiquer que l'animation commence
+    isTweening.current = true;
+    setCameraTweening(true);
+  }, [cameraTarget, cameraPositions, setCameraTweening]);
 
-    // Calculer la direction vers laquelle la caméra doit regarder
+  // Animation fluide vers la nouvelle position
+  useFrame(() => {
+    if (!isTweening.current) return;
+
+    // Vitesse de transition
+    const lerpFactor = 0.05;
+
+    // Animation de la position
+    const distanceSquared = camera.position.distanceToSquared(
+      targetPosition.current
+    );
+    camera.position.lerp(targetPosition.current, lerpFactor);
+
+    // Animation du point de visée
     const currentLookAt = new THREE.Vector3();
     camera.getWorldDirection(currentLookAt);
 
-    // Créer un vecteur temporaire pour la cible
-    const targetLookAt = new THREE.Vector3()
-      .subVectors(lookAtRef.current, camera.position)
+    const targetLookAtDir = new THREE.Vector3()
+      .subVectors(lookAtTarget.current, camera.position)
       .normalize();
 
-    // Interpréter la rotation
     const newDirection = new THREE.Vector3()
       .copy(currentLookAt)
-      .lerp(targetLookAt, 0.05);
+      .lerp(targetLookAtDir, lerpFactor);
 
-    // Appliquer la nouvelle direction
     camera.lookAt(camera.position.clone().add(newDirection.multiplyScalar(10)));
 
-    // Ajuster le zoom de la caméra (vérifier si c'est une PerspectiveCamera)
+    // Mise à jour du FOV si c'est une caméra perspective
     if ("fov" in camera) {
-      camera.fov = THREE.MathUtils.lerp(camera.fov, cameraZoom, 0.05);
+      camera.fov = THREE.MathUtils.lerp(camera.fov, cameraZoom, lerpFactor);
       camera.updateProjectionMatrix();
+    }
+
+    // Vérifier si l'animation est terminée (seuil de proximité)
+    if (distanceSquared < 0.01) {
+      isTweening.current = false;
+      setCameraTweening(false);
     }
   });
 

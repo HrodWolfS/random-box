@@ -11,16 +11,32 @@ import PaperStack from "@/components/3D/PaperStack";
 import Plant from "@/components/3D/Plant";
 import Rug from "@/components/3D/Rug";
 import Wall from "@/components/3D/Wall";
+import { useStore } from "@/lib/store";
 import { Environment, SoftShadows } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
 
 export default function Scene() {
+  const setCameraTarget = useStore((state) => state.setCameraTarget);
+  const cameraTarget = useStore((state) => state.cameraTarget);
+  const cameraTweening = useStore((state) => state.cameraTweening);
+
+  // Gestionnaire pour les clics hors des éléments interactifs
+  const handlePointerMissed = () => {
+    // Ne rien faire si la caméra est déjà en position "room" ou en cours d'animation
+    if (cameraTarget === "room" || cameraTweening) return;
+
+    // Revenir à la vue globale
+    setCameraTarget("room");
+  };
+
   return (
     <Canvas
       shadows
       dpr={[1, 2]}
       camera={{ position: [4, 5, 6], fov: 40, near: 0.1, far: 100 }}
+      onPointerMissed={handlePointerMissed}
+      style={{ cursor: cameraTweening ? "wait" : "default" }}
     >
       <SoftShadows size={10} samples={16} />
       <color attach="background" args={["#f3f0eb"]} />
@@ -49,7 +65,7 @@ export default function Scene() {
         <Couch position={[0.8, 0, -2]} />
         {/* Objets interactifs */}
         <Hat position={[0.5, 1, 0]} />
-        <PaperStack position={[1.3, 0.69, 0]} />
+        <PaperStack position={[1.3, 0.64, 0]} />
         <Board position={[0.5, 1.6, -2]} />
 
         {/* Décorations */}

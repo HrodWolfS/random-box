@@ -3,22 +3,41 @@
 import HistoryNote from "@/components/3D/HistoryNote";
 import { useStore } from "@/lib/store";
 import { Text, useGLTF } from "@react-three/drei";
-import { ThreeElements } from "@react-three/fiber";
+import { ThreeElements, ThreeEvent } from "@react-three/fiber";
+import { useState } from "react";
 
 export default function Board(props: ThreeElements["group"]) {
   const setCameraTarget = useStore((state) => state.setCameraTarget);
+  const cameraTweening = useStore((state) => state.cameraTweening);
   const history = useStore((state) => state.history);
+  const [hovered, setHovered] = useState(false);
 
   const { nodes, materials } = useGLTF("/models/board.glb") as any;
-  console.log(nodes);
 
   // Gérer le clic sur le tableau
-  const handleClick = () => {
-    setCameraTarget("board");
+  const handleClick = (e: ThreeEvent<MouseEvent>) => {
+    e.stopPropagation();
+    if (!cameraTweening) {
+      setCameraTarget("board");
+    }
   };
 
   return (
-    <group {...props} onClick={handleClick}>
+    <group
+      {...props}
+      onClick={handleClick}
+      onPointerOver={(e: ThreeEvent<MouseEvent>) => {
+        e.stopPropagation();
+        if (!cameraTweening) {
+          setHovered(true);
+          document.body.style.cursor = "pointer";
+        }
+      }}
+      onPointerOut={() => {
+        setHovered(false);
+        document.body.style.cursor = "default";
+      }}
+    >
       <primitive
         object={nodes.Message_Board}
         scale={[0.02, 0.02, 0.02]}

@@ -62,10 +62,11 @@ export default function PaperStack(props: ThreeElements["group"]) {
       <Paper position={[0, 0, 0]} />
       <Paper position={[0.05, 0.01, 0.03]} />
       <Paper
-        position={[0.1, , 0.06]}
+        position={[0, 0.02, 0]}
+        rotation={[0, 0.4, 0]}
         onClick={handlePaperClick}
         isFlying={paperFlying}
-        targetPosition={[0, 0.8, 0]}
+        targetPosition={[0.5, 1, 0]}
       />
 
       {/* Formulaire d'input pour ajouter un nom */}

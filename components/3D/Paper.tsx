@@ -18,7 +18,7 @@ export default function Paper({
   name,
   isFlying = false,
   isExiting = false,
-  targetPosition = [0, 0.5, 0],
+  targetPosition = [0.05, 0.55, 0.02],
   onClick,
   ...props
 }: PaperProps) {
@@ -34,6 +34,9 @@ export default function Paper({
     setFlying(isFlying);
     setExiting(isExiting);
     setProgress(0);
+    if (paperRef.current) {
+      paperRef.current.visible = true;
+    }
   }, [isFlying, isExiting]);
 
   // Animation
@@ -47,6 +50,9 @@ export default function Paper({
         if (newProgress >= 1) {
           setFlying(false);
           setExiting(false);
+          if (paperRef.current) {
+            paperRef.current.visible = false;
+          }
           return 1;
         }
         return newProgress;
@@ -78,8 +84,8 @@ export default function Paper({
 
         const midPos: [number, number, number] = [
           (startPos[0] + targetPosition[0]) / 2,
-          Math.max(startPos[1], targetPosition[1]) + 1,
-          (startPos[2] + targetPosition[2]) / 2,
+          (startPos[1] + targetPosition[1]) / 2 + 2.5,
+          (startPos[2] + targetPosition[2]) / 2 + 0.5, // crée un arc en profondeur
         ];
 
         // Interpolation quadratique pour créer un arc
@@ -139,15 +145,10 @@ export default function Paper({
       onClick={onClick}
     >
       {/* Feuille de papier */}
-      <RoundedBox
-        args={[0.7, 0.01, 0.5]}
-        rotation={[0, 1.4, 0]}
-        radius={0.02}
-        smoothness={4}
-        castShadow
-      >
+      <mesh rotation={[0, 1.4, 0]} castShadow>
+        <boxGeometry args={[0.7, 0.002, 0.5]} />
         <meshStandardMaterial color="#ffffff" />
-      </RoundedBox>
+      </mesh>
 
       {/* Texte sur la feuille si un nom est fourni */}
       {name && (

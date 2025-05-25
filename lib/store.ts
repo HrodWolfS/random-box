@@ -18,11 +18,11 @@ type State = {
   // État du champ de saisie
   inputActive: boolean;
   // Contrôle de la caméra
-  cameraTarget: "room" | "desk" | "board" | "hat" | "default";
+  cameraTarget: "room" | "paper" | "board" | "hat" | "default";
   cameraZoom: number;
   cameraPositions: {
     room: CameraPosition;
-    desk: CameraPosition;
+    paper: CameraPosition;
     board: CameraPosition;
     hat: CameraPosition;
     default: CameraPosition;
@@ -63,10 +63,10 @@ export const useStore = create<State & Actions>()(
     cameraTarget: "room",
     cameraZoom: 45,
     cameraPositions: {
-      room: [3.5, 3.2, 4.5], // Vue plongeante latérale plus réaliste
-      desk: [0.4, 1.2, 1.7], // Ajustée sur la table basse
-      board: [0.6, 1.7, 2.0], // Ajustée pour viser le board précisément
-      hat: [0.5, 1.15, 1.5], // Plus proche et centrée sur le chapeau
+      room: [4.5, 5.5, 4.5], // Vue plongeante latérale plus réaliste
+      paper: [0.8, 0.8, 0.8], // Ajustée sur la table basse
+      board: [2, 2, 1.9], // Ajustée pour viser le board précisément
+      hat: [1.6, 1.3, 1.3], // Plus proche et centrée sur le chapeau
       default: [3.5, 3.2, 4.5],
     },
     cameraTweening: false,

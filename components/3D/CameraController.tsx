@@ -18,7 +18,8 @@ export default function CameraController() {
 
   // Mettre à jour la position cible lorsque cameraTarget change
   useEffect(() => {
-    const [x, y, z] = cameraPositions[cameraTarget];
+    const position = cameraPositions[cameraTarget] ?? cameraPositions.default;
+    const [x, y, z] = position;
     targetPosition.current.set(x, y, z);
 
     // Définir le point de visée en fonction de la cible
@@ -26,8 +27,8 @@ export default function CameraController() {
       case "board":
         lookAtTarget.current.set(0, 1.8, -2);
         break;
-      case "desk":
-        lookAtTarget.current.set(0, 0.5, 0);
+      case "paper":
+        lookAtTarget.current.set(0.5, 1.1, 0);
         break;
       case "hat":
         lookAtTarget.current.set(0, 1, 0);

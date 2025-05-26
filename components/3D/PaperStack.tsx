@@ -43,6 +43,11 @@ export default function PaperStack(props: ThreeElements["group"]) {
     }
   }, [inputActive]);
 
+  // Calculer la position absolue du chapeau
+  // PaperStack est à [1.3, 0.64, 0] et Hat est à [0.5, 1, 0]
+  // Donc position relative du chapeau par rapport à la pile : [0.5 - 1.3, 1 - 0.64, 0 - 0] = [-0.8, 0.36, 0]
+  const hatTargetPosition: [number, number, number] = [-0.8, 0.36, 0];
+
   return (
     <group
       {...props}
@@ -66,7 +71,7 @@ export default function PaperStack(props: ThreeElements["group"]) {
         rotation={[0, 0.4, 0]}
         onClick={handlePaperClick}
         isFlying={paperFlying}
-        targetPosition={[0.5, 1, 0]}
+        targetPosition={hatTargetPosition}
       />
 
       {/* Formulaire d'input pour ajouter un nom */}

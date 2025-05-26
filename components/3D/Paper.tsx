@@ -1,7 +1,7 @@
 "use client";
 
 import { Name } from "@/lib/store";
-import { RoundedBox, Text } from "@react-three/drei";
+import { Text } from "@react-three/drei";
 import { ThreeElements, useFrame } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
@@ -18,13 +18,14 @@ export default function Paper({
   name,
   isFlying = false,
   isExiting = false,
-  targetPosition = [0.05, 0.55, 0.02],
+  targetPosition = [0.5, 1, 0],
   onClick,
   ...props
 }: PaperProps) {
   const paperRef = useRef<THREE.Group>(null);
   const [position, setPosition] = useState<[number, number, number]>([0, 0, 0]);
   const [rotation, setRotation] = useState<[number, number, number]>([0, 0, 0]);
+  const [scale, setScale] = useState<[number, number, number]>([1, 1, 1]);
   const [flying, setFlying] = useState(isFlying);
   const [exiting, setExiting] = useState(isExiting);
   const [progress, setProgress] = useState(0);
@@ -34,6 +35,7 @@ export default function Paper({
     setFlying(isFlying);
     setExiting(isExiting);
     setProgress(0);
+    setScale([1, 1, 1]); // Réinitialiser le scale
     if (paperRef.current) {
       paperRef.current.visible = true;
     }
@@ -46,7 +48,7 @@ export default function Paper({
     if (flying || exiting) {
       // Augmenter la progression de l'animation
       setProgress((prev) => {
-        const newProgress = prev + 0.02;
+        const newProgress = prev + 0.01; // Animation plus lente
         if (newProgress >= 1) {
           setFlying(false);
           setExiting(false);
@@ -58,9 +60,9 @@ export default function Paper({
         return newProgress;
       });
 
-      // Animation de vol
+      // Animation de vol vers le chapeau
       if (flying) {
-        // S'assurer que props.position est défini et de type [number, number, number]
+        // Position de départ
         const defaultPos: [number, number, number] = [1.5, 0.5, 0];
         let startPos: [number, number, number];
 
@@ -82,34 +84,48 @@ export default function Paper({
           startPos = defaultPos;
         }
 
-        const midPos: [number, number, number] = [
+        const t = progress;
+
+        // Point de contrôle pour créer un arc qui monte puis descend vers le chapeau
+        const controlPoint: [number, number, number] = [
           (startPos[0] + targetPosition[0]) / 2,
-          (startPos[1] + targetPosition[1]) / 2 + 2.5,
-          (startPos[2] + targetPosition[2]) / 2 + 0.5, // crée un arc en profondeur
+          Math.max(startPos[1], targetPosition[1]) + 2, // Point haut de l'arc
+          (startPos[2] + targetPosition[2]) / 2,
         ];
 
-        // Interpolation quadratique pour créer un arc
-        const t = progress;
+        // Courbe de Bézier quadratique pour un mouvement fluide
         const pos: [number, number, number] = [
           (1 - t) * (1 - t) * startPos[0] +
-            2 * (1 - t) * t * midPos[0] +
+            2 * (1 - t) * t * controlPoint[0] +
             t * t * targetPosition[0],
+
           (1 - t) * (1 - t) * startPos[1] +
-            2 * (1 - t) * t * midPos[1] +
+            2 * (1 - t) * t * controlPoint[1] +
             t * t * targetPosition[1],
+
           (1 - t) * (1 - t) * startPos[2] +
-            2 * (1 - t) * t * midPos[2] +
+            2 * (1 - t) * t * controlPoint[2] +
             t * t * targetPosition[2],
         ];
 
         setPosition(pos);
 
-        // Rotation pendant le vol
+        // Rotation qui s'accélère vers la fin (effet d'aspiration)
+        const rotationSpeed = 1 + t * 4; // Accélération de la rotation
         setRotation([
-          t * Math.PI * 2,
-          t * Math.PI,
-          Math.sin(t * Math.PI * 2) * 0.3,
+          t * Math.PI * 2 * rotationSpeed,
+          t * Math.PI * 1.5 * rotationSpeed,
+          Math.sin(t * Math.PI * 3) * 0.3,
         ]);
+
+        // Effet de scale : rétrécissement progressif dans les 30% finaux de l'animation
+        let scaleValue = 1;
+        if (t > 0.7) {
+          // Commencer à rétrécir à partir de 70% de l'animation
+          const shrinkProgress = (t - 0.7) / 0.3; // Normaliser entre 0 et 1
+          scaleValue = 1 - shrinkProgress * 0.8; // Rétrécir jusqu'à 20% de la taille originale
+        }
+        setScale([scaleValue, scaleValue, scaleValue]);
       }
 
       // Animation de sortie de la boîte
@@ -142,6 +158,7 @@ export default function Paper({
       {...props}
       position={flying || exiting ? position : props.position}
       rotation={flying || exiting ? rotation : props.rotation}
+      scale={flying || exiting ? scale : [1, 1, 1]}
       onClick={onClick}
     >
       {/* Feuille de papier */}

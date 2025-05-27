@@ -10,9 +10,11 @@ export default function PaperStack(props: ThreeElements["group"]) {
   const [inputValue, setInputValue] = useState("");
   const [hovered, setHovered] = useState(false);
   const addName = useStore((state) => state.addName);
+  const addToHistory = useStore((state) => state.addToHistory);
   const inputActive = useStore((state) => state.inputActive);
   const setInputActive = useStore((state) => state.setInputActive);
   const paperFlying = useStore((state) => state.paperFlying);
+  const setPaperFlying = useStore((state) => state.setPaperFlying);
   const setCameraTarget = useStore((state) => state.setCameraTarget);
   const cameraTweening = useStore((state) => state.cameraTweening);
 
@@ -20,7 +22,7 @@ export default function PaperStack(props: ThreeElements["group"]) {
   const handlePaperClick = () => {
     if (!cameraTweening) {
       setInputActive(true);
-      setCameraTarget("desk");
+      setCameraTarget("paper");
     }
   };
 
@@ -28,6 +30,17 @@ export default function PaperStack(props: ThreeElements["group"]) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (inputValue.trim()) {
+      console.log("Soumission du nom:", inputValue.trim());
+      addName(inputValue.trim());
+      setInputValue("");
+    }
+  };
+
+  // Gérer la touche Enter
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && inputValue.trim()) {
+      e.preventDefault(); // Empêcher la soumission du formulaire
+      console.log("Touche Enter pressée avec:", inputValue.trim());
       addName(inputValue.trim());
       setInputValue("");
     }
@@ -87,6 +100,7 @@ export default function PaperStack(props: ThreeElements["group"]) {
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
               placeholder="Entrez un nom..."
               className="w-full p-2 mb-2 border rounded"
               autoFocus

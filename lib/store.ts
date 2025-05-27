@@ -37,6 +37,8 @@ type State = {
 type Actions = {
   // Ajouter un nom à la liste
   addName: (text: string) => void;
+  // Ajouter un nom à l'historique
+  addToHistory: (name: Name) => void;
   // Tirer un nom au sort
   drawName: () => void;
   // Activer/désactiver le champ de saisie
@@ -64,7 +66,7 @@ export const useStore = create<State & Actions>()(
     cameraZoom: 45,
     cameraPositions: {
       room: [4.5, 5.5, 4.5], // Vue plongeante latérale plus réaliste
-      paper: [0.8, 0.8, 0.8], // Ajustée sur la table basse
+      paper: [2.2, 2.5, 1.8], // Position pour voir la pile de papiers (PaperStack à [1.3, 0.64, 0])
       board: [2, 2, 1.9], // Ajustée pour viser le board précisément
       hat: [1.6, 1.3, 1.3], // Plus proche et centrée sur le chapeau
       default: [3.5, 3.2, 4.5],
@@ -77,8 +79,9 @@ export const useStore = create<State & Actions>()(
     // Actions
     addName: (text) => {
       const newName = { id: crypto.randomUUID(), text };
+      console.log("addName - Ajout à l'historique:", newName);
       set((state) => ({
-        names: [...state.names, newName],
+        history: [...state.history, newName],
         inputActive: false,
         paperFlying: true,
       }));
@@ -87,6 +90,13 @@ export const useStore = create<State & Actions>()(
       setTimeout(() => {
         get().resetAnimationStates();
       }, 2000);
+    },
+
+    addToHistory: (name) => {
+      console.log("Ajout à l'historique:", name);
+      set((state) => ({
+        history: [...state.history, name],
+      }));
     },
 
     drawName: () => {

@@ -28,10 +28,10 @@ export default function CameraController() {
         lookAtTarget.current.set(0, 1.8, -2);
         break;
       case "paper":
-        lookAtTarget.current.set(0.5, 1.1, 0);
+        lookAtTarget.current.set(1.3, 0.8, 0);
         break;
       case "hat":
-        lookAtTarget.current.set(0, 1, 0);
+        lookAtTarget.current.set(0.5, 1, 0);
         break;
       default:
         lookAtTarget.current.set(0, 0.5, 0);

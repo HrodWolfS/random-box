@@ -12,6 +12,8 @@ export default function Board(props: ThreeElements["group"]) {
   const history = useStore((state) => state.history);
   const [hovered, setHovered] = useState(false);
 
+  console.log("Board - Historique actuel:", history);
+
   const { nodes, materials } = useGLTF("/models/board.glb") as any;
 
   // Gérer le clic sur le tableau
@@ -61,11 +63,11 @@ export default function Board(props: ThreeElements["group"]) {
       </Text>
 
       {/* Notes d'historique affichées dans le tableau */}
-      <group position={[0, 40, 1]}>
+      <group position={[0, 0.4, 0.1]}>
         {!Array.isArray(history) || history.length === 0 ? (
           <Text
             position={[0, 0, 0]}
-            fontSize={0.1}
+            fontSize={0.08}
             color="#444444"
             anchorX="center"
             anchorY="middle"
@@ -74,10 +76,11 @@ export default function Board(props: ThreeElements["group"]) {
           </Text>
         ) : (
           history?.slice?.(0, 9)?.map((name, index) => {
+            console.log(`Affichage note ${index}:`, name);
             const row = Math.floor(index / 3);
             const col = index % 3;
-            const x = (col - 1) * 0.9;
-            const y = 0.4 - row * 0.6;
+            const x = (col - 1) * 0.4;
+            const y = 0.2 - row * 0.3;
 
             return (
               <HistoryNote key={name.id} position={[x, y, 0]} name={name} />

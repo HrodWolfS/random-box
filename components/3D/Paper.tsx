@@ -128,26 +128,39 @@ export default function Paper({
         setScale([scaleValue, scaleValue, scaleValue]);
       }
 
-      // Animation de sortie de la boîte
+      // Animation de sortie du chapeau
       if (exiting) {
-        const startPos: [number, number, number] = [0, 0.8, 0];
-        const endPos: [number, number, number] = [0, 1.5, -1.5];
+        const startPos: [number, number, number] = props.position
+          ? Array.isArray(props.position)
+            ? (props.position as [number, number, number])
+            : [0.5, 1, 0]
+          : [0.5, 1, 0];
+        const endPos: [number, number, number] = targetPosition || [
+          0, 1.5, -1.5,
+        ];
 
-        // Position linéaire entre départ et arrivée
+        // Position avec courbe pour un mouvement plus naturel
+        const t = progress;
         const pos: [number, number, number] = [
-          startPos[0] + (endPos[0] - startPos[0]) * progress,
-          startPos[1] + (endPos[1] - startPos[1]) * progress,
-          startPos[2] + (endPos[2] - startPos[2]) * progress,
+          startPos[0] + (endPos[0] - startPos[0]) * t,
+          startPos[1] +
+            (endPos[1] - startPos[1]) * t +
+            Math.sin(t * Math.PI) * 0.5, // Arc léger
+          startPos[2] + (endPos[2] - startPos[2]) * t,
         ];
 
         setPosition(pos);
 
-        // Rotation pendant la sortie
+        // Rotation pendant la sortie avec accélération
         setRotation([
-          progress * Math.PI * 0.5,
-          0,
-          Math.sin(progress * Math.PI * 4) * 0.2,
+          t * Math.PI * 2,
+          t * Math.PI * 1.5,
+          Math.sin(t * Math.PI * 4) * 0.3,
         ]);
+
+        // Scale dynamique : commence petit, grandit, puis se stabilise
+        const scaleValue = 0.8 + t * 0.2;
+        setScale([scaleValue, scaleValue, scaleValue]);
       }
     }
   });

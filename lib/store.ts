@@ -15,6 +15,8 @@ type State = {
   history: Name[];
   // Nom actuellement sélectionné/tiré
   selectedName: Name | null;
+  // Dernier nom tiré du chapeau
+  drawnName: Name | null;
   // État du champ de saisie
   inputActive: boolean;
   // Contrôle de la caméra
@@ -41,6 +43,8 @@ type Actions = {
   addToHistory: (name: Name) => void;
   // Tirer un nom au sort
   drawName: () => void;
+  // Tirer un nom aléatoire depuis l'historique
+  drawRandomName: () => void;
   // Activer/désactiver le champ de saisie
   setInputActive: (active: boolean) => void;
   // Contrôler la caméra
@@ -61,6 +65,7 @@ export const useStore = create<State & Actions>()(
     names: [],
     history: [],
     selectedName: null,
+    drawnName: null,
     inputActive: false,
     cameraTarget: "room",
     cameraZoom: 45,
@@ -122,6 +127,29 @@ export const useStore = create<State & Actions>()(
       }, 2000);
     },
 
+    drawRandomName: () => {
+      const { history } = get();
+      if (history.length === 0) return;
+
+      // Tirer un nom aléatoire depuis l'historique
+      const randomIndex = Math.floor(Math.random() * history.length);
+      const drawnName = history[randomIndex];
+
+      // Retirer le nom de l'historique et l'ajouter à la liste
+      set((state) => ({
+        history: state.history.filter((_, index) => index !== randomIndex),
+        names: [drawnName, ...state.names],
+        drawnName,
+        boxShaking: true,
+        paperExiting: true,
+      }));
+
+      // Réinitialiser l'état d'animation après un délai
+      setTimeout(() => {
+        get().resetAnimationStates();
+      }, 2000);
+    },
+
     setInputActive: (active) => set({ inputActive: active }),
     setCameraTarget: (target) => set({ cameraTarget: target }),
     setCameraZoom: (zoom) => set({ cameraZoom: zoom }),
@@ -135,6 +163,7 @@ export const useStore = create<State & Actions>()(
         boxShaking: false,
         paperFlying: false,
         paperExiting: false,
+        drawnName: null, // Réinitialiser le nom tiré
       }),
   }))
 );
